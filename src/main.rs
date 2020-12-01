@@ -16,21 +16,45 @@ fn main() {
             if let Ok(expense) = line {
                 let expense = expense.parse::<i32>();
                 if let Ok(expense) = expense {
-                    println!("{}", expense);
+                    //println!("{}", expense);
                     expenses.push(expense);
                 }
             }
         }
 
+        expenses.sort();
+
+        let mut loop_count = 0;
+
         for e1 in &expenses {
+            let mut sum: i32 = *e1;
+            //println!("sum1 = {}", sum);
+            if sum > 2020 {
+                loop_count += 1;
+                continue;
+            }
             for e2 in &expenses {
+                sum = e1 + e2;
+                //println!("sum2 = {}", sum);
+                if sum > 2020 {
+                    loop_count += 1;
+                    break;
+                }
                 for e3 in &expenses {
-                    let sum = e1 + e2 + e3;
+                    sum = e1 + e2 + e3;
+                    //println!("sum3 = {}", sum);
+                    if sum > 2020 {
+                        loop_count += 1;
+                        break;
+                    }
                     if sum == 2020 {
                         println!("{} + {} + {} = {} => {}", e1, e2, e3, sum, e1*e2*e3);
                     }
+                    loop_count += 1;
                 }
             }
         }
+
+        println!("loop_count = {}", loop_count);
     }
 }
