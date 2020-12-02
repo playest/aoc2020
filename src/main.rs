@@ -19,17 +19,30 @@ fn main() {
                 let password = parts[1].trim();
 
                 let policy_parts: Vec<&str> = policy.split(" ").collect();
-                let policy_letter = policy_parts[1];
+                let policy_letter = policy_parts[1].chars().nth(0).unwrap();
                 let policy_nums: Vec<&str> = policy_parts[0].split("-").collect();
-                let policy_min_times: u32 = policy_nums[0].parse::<u32>().unwrap();
-                let policy_max_times: u32 = policy_nums[1].parse::<u32>().unwrap();
+                let policy_min_times: usize = policy_nums[0].parse::<usize>().unwrap() - 1;
+                let policy_max_times: usize = policy_nums[1].parse::<usize>().unwrap() - 1;
 
                 //println!("{} at [{}-{}] times in {}", policy_letter, policy_min_times, policy_max_times, password);
 
-                let letter_count = password.matches(policy_letter).count() as u32;
-                if letter_count >= policy_min_times && letter_count <= policy_max_times {
-                    println!("{}", password);
+                let pattern = String::from("                                    ");
+                let mut pattern_bytes = pattern.into_bytes();
+                pattern_bytes[policy_min_times] = '*' as u8;
+                pattern_bytes[policy_max_times] = '*' as u8;
+                let pattern = String::from_utf8(pattern_bytes).unwrap();
+
+                let c1 = password.chars().nth(policy_min_times);
+                let c2 = password.chars().nth(policy_max_times);
+                if  c1.ne(&c2) && (
+                    c1.map_or_else(|| false, |c| c.eq(&policy_letter)) ||
+                    c2.map_or_else(|| false, |c| c.eq(&policy_letter))
+                ) {
+                    println!("+ {:20} valid   {} at pos [{:>2}-{:>2}]({}, {}) len={:>2}\n{:20}", password, policy_letter, policy_min_times, policy_max_times, c1.unwrap_or('?'), c2.unwrap_or('?'), password.len(), pattern);
                     valid_count += 1;
+                }
+                else {
+                    println!("- {:20} invalid {} at pos [{:>2}-{:>2}]({}, {}) len={:>2}\n{:20}", password, policy_letter, policy_min_times, policy_max_times, c1.unwrap_or('?'), c2.unwrap_or('?'), password.len(), pattern);
                 }
             }
         }
