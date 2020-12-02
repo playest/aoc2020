@@ -9,52 +9,31 @@ where P: AsRef<Path>, {
 }
 
 fn main() {
-    if let Ok(lines) = read_lines("./inputs/input1.txt") {
+    if let Ok(lines) = read_lines("./inputs/input_day2.txt") {
         // Consumes the iterator, returns an (Optional) String
-        let mut expenses: Vec<i32> = Vec::new();
+        let mut valid_count = 0;
         for line in lines {
-            if let Ok(expense) = line {
-                let expense = expense.parse::<i32>();
-                if let Ok(expense) = expense {
-                    //println!("{}", expense);
-                    expenses.push(expense);
+            if let Ok(line) = line {
+                let parts: Vec<&str> = line.split(":").collect();
+                let policy = parts[0];
+                let password = parts[1].trim();
+
+                let policy_parts: Vec<&str> = policy.split(" ").collect();
+                let policy_letter = policy_parts[1];
+                let policy_nums: Vec<&str> = policy_parts[0].split("-").collect();
+                let policy_min_times: u32 = policy_nums[0].parse::<u32>().unwrap();
+                let policy_max_times: u32 = policy_nums[1].parse::<u32>().unwrap();
+
+                //println!("{} at [{}-{}] times in {}", policy_letter, policy_min_times, policy_max_times, password);
+
+                let letter_count = password.matches(policy_letter).count() as u32;
+                if letter_count >= policy_min_times && letter_count <= policy_max_times {
+                    println!("{}", password);
+                    valid_count += 1;
                 }
             }
         }
 
-        expenses.sort();
-
-        let mut loop_count = 0;
-
-        for e1 in expenses.iter() {
-            let mut sum: i32 = *e1;
-            //println!("sum1 = {}", sum);
-            if sum > 2020 {
-                loop_count += 1;
-                continue;
-            }
-            for e2 in expenses.iter() {
-                sum = e1 + e2;
-                //println!("sum2 = {}", sum);
-                if sum > 2020 {
-                    loop_count += 1;
-                    break;
-                }
-                for e3 in expenses.iter() {
-                    sum = e1 + e2 + e3;
-                    //println!("sum3 = {}", sum);
-                    if sum > 2020 {
-                        loop_count += 1;
-                        break;
-                    }
-                    if sum == 2020 {
-                        println!("{} + {} + {} = {} => {}", e1, e2, e3, sum, e1*e2*e3);
-                    }
-                    loop_count += 1;
-                }
-            }
-        }
-
-        println!("loop_count = {}", loop_count);
+        println!("valid count: {}", valid_count);
     }
 }
