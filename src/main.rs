@@ -175,27 +175,39 @@ fn main() {
         }
         println!("{}", map);
 
-        let mut map_browser = MapBrowser::new(&mut map, 0, 0);
-        //let mut maybe_square = map_browser.walk_mut(1, 3);
-        let mut again = true;
-        let mut tree_count = 0;
-        let mut open_count = 0;
-        while again {
-            let mut maybe_square = map_browser.walk_mut(3, 1);
-            match maybe_square {
-                None => again = false,
-                Some(square) => {
-                    square.mark();
-                    println!("{}", square);
-                    match square.kind {
-                        TerrainType::Tree => tree_count += 1,
-                        TerrainType::Open => open_count += 1,
-                    }
-                },
+
+        let mut tree_counts: Vec<u64> = Vec::new();
+        for (x_offset, y_offset) in vec!((1, 1), (3, 1), (5, 1), (7, 1), (1, 2)) {
+            let mut map_browser = MapBrowser::new(&mut map, 0, 0);
+            //let mut maybe_square = map_browser.walk_mut(1, 3);
+            let mut again = true;
+            let mut tree_count = 0;
+            let mut open_count = 0;
+            while again {
+                let mut maybe_square = map_browser.walk_mut(x_offset, y_offset);
+                match maybe_square {
+                    None => again = false,
+                    Some(square) => {
+                        square.mark();
+                        //println!("{}", square);
+                        match square.kind {
+                            TerrainType::Tree => tree_count += 1,
+                            TerrainType::Open => open_count += 1,
+                        }
+                    },
+                }
             }
+            
+            //println!("{}", map);
+            println!("tree_count: {}, open_count: {}", tree_count, open_count);
+            tree_counts.push(tree_count);
         }
 
-        println!("{}", map);
-        println!("tree_count: {}, open_count: {}", tree_count, open_count);
+        let mut product: u64 = 1;
+        for tc in tree_counts {
+            product *= tc;
+        }
+
+        println!("product: {}", product);
     }
 }
