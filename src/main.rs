@@ -9,11 +9,17 @@ where P: AsRef<Path>, {
 }
 
 #[derive(Debug)]
+enum Height {
+    Inches(i32),
+    Centimers(i32),
+}
+
+#[derive(Debug)]
 struct Document {
-    birth_year: Option<String>, // byr
-    issue_year: Option<String>, // iyr
-    expiration_year: Option<String>, // eyr
-    height: Option<String>, // hgt
+    birth_year: Option<i32>, // byr
+    issue_year: Option<i32>, // iyr
+    expiration_year: Option<i32>, // eyr
+    height: Option<Height>, // hgt
     hair_color: Option<String>, // hcl
     eye_color: Option<String>, // ecl
     passport_id: Option<String>, // pid
@@ -35,15 +41,27 @@ impl Document {
     }
 
     fn is_valid(&self) -> bool {
-        self.birth_year.is_some() &&
-        self.issue_year.is_some() &&
-        self.expiration_year.is_some() &&
-        self.height.is_some() &&
-        self.hair_color.is_some() &&
-        self.eye_color.is_some() &&
-        self.passport_id.is_some() &&
-        //self.country_id.is_some() &&
-        true
+        let birth_year_check = self.birth_year.map_or(false, |by| by >= 1920 && by <= 2002);
+        let issue_year_check = self.issue_year.map_or(false, |by| by >= 2010 && by <= 2020);
+        let expiration_year_check = self.expiration_year.map_or(false, |by| by >= 2020 && by <= 2030);
+        let height_check = self.height.as_ref().map_or(false, |h| match h {
+            Height::Centimers(h) => *h >= 150 && *h <= 193,
+            Height::Inches(h) => *h >= 59 && *h <= 76,
+        });
+
+        let hexa: &[_] = &['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+        let hair_color_check = self.hair_color.as_ref().map_or(false, |hc| hc.len() == 7 && hc.trim_end_matches(hexa).eq("#"));
+        
+        let eye_color_check = self.eye_color.as_ref().map_or(false, |ec| ec.eq("amb") || ec.eq("blu") || ec.eq("brn") || ec.eq("gry") || ec.eq("grn") || ec.eq("hzl") || ec.eq("oth"));
+
+        let numbers: &[_] = &['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        let passport_id_check = self.passport_id.as_ref().map_or(false, |pi| pi.len() == 9 && pi.trim_start_matches(numbers).is_empty());
+
+        let valid = birth_year_check && issue_year_check && expiration_year_check && height_check && hair_color_check && eye_color_check && passport_id_check;
+
+        println!("valid?:\n\tbirth_year: {}\n\tissue_year: {}\n\texpiration_year: {}\n\theight: {}\n\thair_color: {}\n\teye_color: {}\n\tpassport_id: {}\n\t=> valid: {}", birth_year_check, issue_year_check, expiration_year_check, height_check, hair_color_check, eye_color_check, passport_id_check, valid);
+
+        valid
     }
 }
 
@@ -68,25 +86,30 @@ fn main() {
                                 if current_doc.birth_year.is_some() {
                                     panic!("Do not erase current_doc.birth_year: {:?}", current_doc.birth_year);
                                 }
-                                current_doc.birth_year = Some(String::from(value))
+                                current_doc.birth_year = Some(value.parse::<i32>().unwrap())
                             },
                             "iyr" => {
                                 if current_doc.issue_year.is_some() {
                                     panic!("Do not erase current_doc.issue_year: {:?}", current_doc.issue_year);
                                 }
-                                current_doc.issue_year = Some(String::from(value))
+                                current_doc.issue_year = Some(value.parse::<i32>().unwrap())
                             },
                             "eyr" => {
                                 if current_doc.expiration_year.is_some() {
                                     panic!("Do not erase current_doc.expiration_year: {:?}", current_doc.expiration_year);
                                 }
-                                current_doc.expiration_year = Some(String::from(value))
+                                current_doc.expiration_year = Some(value.parse::<i32>().unwrap())
                             },
                             "hgt" => {
                                 if current_doc.height.is_some() {
                                     panic!("Do not erase current_doc.height: {:?}", current_doc.height);
                                 }
-                                current_doc.height = Some(String::from(value))
+                                if value.ends_with("cm") {
+                                    current_doc.height = Some(Height::Centimers(value.trim_end_matches("cm").parse::<i32>().unwrap()))
+                                }
+                                else if value.ends_with("in") {
+                                    current_doc.height = Some(Height::Inches(value.trim_end_matches("in").parse::<i32>().unwrap()))
+                                }
                             },
                             "hcl" => {
                                 if current_doc.hair_color.is_some() {
