@@ -51,7 +51,7 @@ impl Document {
 
         let hexa: &[_] = &['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
         let hair_color_check = self.hair_color.as_ref().map_or(false, |hc| hc.len() == 7 && hc.trim_end_matches(hexa).eq("#"));
-        
+
         let eye_color_check = self.eye_color.as_ref().map_or(false, |ec| ec.eq("amb") || ec.eq("blu") || ec.eq("brn") || ec.eq("gry") || ec.eq("grn") || ec.eq("hzl") || ec.eq("oth"));
 
         let numbers: &[_] = &['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -144,14 +144,14 @@ fn main() {
         docs.push(current_doc);
 
         let mut valid_count = 0;
-        for doc in docs {
+        for doc in &docs {
             println!("- {:?}", doc);
             if doc.is_valid() {
                 valid_count += 1;
             }
         }
 
-        println!("valid_count: {}", valid_count);
+        println!("doc_count: {}, valid_count: {}", docs.len(), valid_count);
         
     }
 }
