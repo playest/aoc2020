@@ -33,6 +33,18 @@ impl Document {
             country_id: None,
         }
     }
+
+    fn is_valid(&self) -> bool {
+        self.birth_year.is_some() &&
+        self.issue_year.is_some() &&
+        self.expiration_year.is_some() &&
+        self.height.is_some() &&
+        self.hair_color.is_some() &&
+        self.eye_color.is_some() &&
+        self.passport_id.is_some() &&
+        //self.country_id.is_some() &&
+        true
+    }
 }
 
 fn main() {
@@ -108,9 +120,15 @@ fn main() {
         }
         docs.push(current_doc);
 
+        let mut valid_count = 0;
         for doc in docs {
             println!("- {:?}", doc);
+            if doc.is_valid() {
+                valid_count += 1;
+            }
         }
+
+        println!("valid_count: {}", valid_count);
         
     }
 }
