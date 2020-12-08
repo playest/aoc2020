@@ -54,5 +54,13 @@ fn main() {
         }
         seat_ids.sort();
         println!("highest seat id: {:?}", seat_ids.last());
+
+        let mut previous = seat_ids.first().unwrap();
+        for sid in &seat_ids[1..] {
+            if sid - previous != 1 {
+                println!("seat {} was skipped", sid - 1);
+            }
+            previous = sid;
+        }
     }
 }
