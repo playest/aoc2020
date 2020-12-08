@@ -35,9 +35,9 @@ fn main() {
                     else {
                         println!("Unknown char: {}", char);
                     }
-                    println!("{} -> row: [{}, {}[, col: [{}, {}[", char, row_min, row_max, col_min, col_max);
+                    //println!("{} -> row: [{}, {}[, col: [{}, {}[", char, row_min, row_max, col_min, col_max);
                 }
-                println!("");
+                //println!("");
 
                 if row_max - row_min == 1 && col_max - col_min == 1 {
                     let row = row_min;
@@ -53,6 +53,6 @@ fn main() {
             }
         }
         seat_ids.sort();
-        println!("{:?}", seat_ids);
+        println!("highest seat id: {:?}", seat_ids.last());
     }
 }
