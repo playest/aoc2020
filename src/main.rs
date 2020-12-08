@@ -11,7 +11,7 @@ where P: AsRef<Path>, {
 }
 
 fn main() {
-    if let Ok(lines) = read_lines("./inputs/input_day6.txt") {
+    if let Ok(lines) = read_lines("./inputs/input_day7.txt") {
         for line in lines {
             if let Ok(line) = line {
                 println!("line: {}", line);
