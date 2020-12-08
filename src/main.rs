@@ -18,7 +18,7 @@ fn main() {
                 let mut row_max = 128;
                 let mut col_min = 0;
                 let mut col_max = 8;
-                //let chars: Vec<char> = line.chars().collect();
+
                 for char in line.chars() {
                     if char == 'F' {
                         row_max -= (row_max - row_min) / 2;
