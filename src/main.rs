@@ -169,12 +169,12 @@ fn main() {
             while let Some((coef, bag_index)) = to_explore.pop() {
             //for bag_index in to_explore {
                 let bag = rules.kind_of_bags_by_index.get(bag_index).unwrap();
-                for (count, inside_id) in &bag.contains {
-                    let inside = rules.kind_of_bags_by_index.get(*inside_id).unwrap();
+                for &(count, inside_id) in bag.contains.iter() {
+                    let inside = rules.kind_of_bags_by_index.get(inside_id).unwrap();
                     println!("{} contains {} bags of id {} ({})", bag.color, count, inside_id, inside.color);
                     bag_count += coef * count;
                     println!("\tcount: {}", bag_count);
-                    to_explore2.push((*count * coef, *inside_id));
+                    to_explore2.push((count * coef, inside_id));
                 }
             }
             println!("to explore: {:?}", to_explore2);
