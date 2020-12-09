@@ -41,8 +41,8 @@ impl Executer {
         *executed = 1;
 
         let op = program.get(self.current_operation_index);
-        println!("op: {:?}", op);
-        println!("executer: {:?}", self);
+        //println!("op: {:?}", op);
+        //println!("executer: {:?}", self);
         match op {
             Some(Operation::Nop(_)) => {},
             Some(Operation::Acc(v)) => self.accumulator += v,
@@ -91,7 +91,6 @@ fn main() {
         for (i, _) in program.iter().enumerate() {
             program2 = program.clone();
             let op = program2.get_mut(i).unwrap();
-            let saved_op = op.clone();
             match op {
                 Operation::Nop(v) => {
                     *op = Operation::Jmp(*v);
