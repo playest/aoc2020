@@ -16,15 +16,15 @@ enum Operation {
 }
 
 #[derive(Debug)]
-struct Executer {
-    operations: Vec<Operation>,
+struct Executer<'a> {
+    operations: &'a Vec<Operation>,
     accumulator: i32,
     current_operation_index: usize,
     exec: Vec<i8>,
 }
 
-impl Executer {
-    fn new(program: Vec<Operation>) -> Self {
+impl<'a> Executer<'a> {
+    fn new(program: &'a Vec<Operation>) -> Self {
         Executer {
             operations: program,
             accumulator: 0,
@@ -74,7 +74,7 @@ fn main() {
             }
         }
 
-        let mut executer = Executer::new(program);
+        let mut executer = Executer::new(&program);
         let mut previous_accumulator = executer.accumulator;
         loop {
             let (finished, looping) = executer.step();
