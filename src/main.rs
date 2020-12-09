@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Debug, fs::File};
+use std::{collections::{HashMap, HashSet}, fmt::Debug, fs::File};
 use std::io::{self, BufRead};
 use std::path::Path;
 
@@ -11,7 +11,7 @@ where P: AsRef<Path>, {
 #[derive(Debug)]
 struct KindOfBag {
     color: String,
-    contains: Vec<(i32, usize)>,
+    contains: Vec<(i32, usize)>, // number, index_in_array
 }
 
 impl<'a> KindOfBag {
@@ -56,11 +56,23 @@ impl BagRules {
         }
     }
 
+    fn get_bag_kind(&self, color: &str) -> &KindOfBag {
+        let index_in_vec = self.index_by_color.get(color).unwrap();
+        self.kind_of_bags_by_index.get(*index_in_vec).unwrap()
+    }
+
     fn add_rule(&mut self, container_color: &str, count: i32, containee_color: &str) {
         let container = self.get_or_create_bag_kind(container_color.to_string());
         let containee = self.get_or_create_bag_kind(containee_color.to_string());
         let a = self.kind_of_bags_by_index.get_mut(container).unwrap();
         a.add_containee(count, containee);
+    }
+
+    fn can_contain(&self, container_bag: &KindOfBag, bag: &KindOfBag) -> bool {
+        let index_bag = self.index_by_color.get(&bag.color).unwrap();
+        let res = container_bag.contains.iter().find(|(_, bag_id)| *bag_id == *index_bag);
+        //println!("can_contain search for id {}\n\t{:?}\n\t{:?}\n\t{:?}", index_bag, container_bag, bag, res);
+        res.is_some()
     }
 }
 
@@ -105,6 +117,35 @@ fn main() {
                 }
             }
         }
+
         println!("Rules:\n{:?}", rules);
+
+        let searched = rules.get_bag_kind("shiny gold");
+        let mut found: HashSet<String> = HashSet::new();
+        found.insert(searched.color.to_string());
+        let mut previous_found_num = 0;
+        let mut found_num = found.len();
+
+        while found_num != previous_found_num {
+            let mut found2: HashSet<String> = HashSet::new();
+            for bag in &rules.kind_of_bags_by_index {
+                for f in &found {
+                    //println!("can {} contain {}?", bag.color, f);
+                    let f = rules.get_bag_kind(f);
+                    if rules.can_contain(&bag, f) {
+                        found2.insert(bag.color.clone());
+                        //println!("\tyes!");
+                    }
+                }
+            }
+            println!("found this round: {:?}", found2);
+            found = found.union(&found2).cloned().collect();
+            println!("found: {:?}", found);
+            previous_found_num = found_num;
+            found_num = found.len();
+        }
+
+        // len()-1 because we remove the actual searched bag from the set
+        println!("{} way to get a {}", found.len() - 1, searched.color);
     }
 }
