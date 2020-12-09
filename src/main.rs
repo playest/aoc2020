@@ -74,6 +74,14 @@ impl BagRules {
         //println!("can_contain search for id {}\n\t{:?}\n\t{:?}\n\t{:?}", index_bag, container_bag, bag, res);
         res.is_some()
     }
+
+    fn children(&self, container_bag: &KindOfBag) -> Vec<&KindOfBag> {
+        let mut res: Vec<&KindOfBag> = Vec::new();
+        for (_, bag_id) in &container_bag.contains {
+            res.push(self.kind_of_bags_by_index.get(*bag_id).unwrap());
+        }
+        res
+    }
 }
 
 impl Debug for BagRules {
@@ -99,19 +107,19 @@ fn main() {
                 
                 let color: Vec<&str> = words[0].split_whitespace().collect();
                 let color = &color[0..2].join(" ");
-                println!("{}", color);
+                //println!("{}", color);
                 
                 let contains: Vec<&str> = words[1].trim_end_matches('.').split(", ").collect();
                 //println!("\tcolor {:?}", contains);
                 for content in contains {
                     if content == "no other bags" {
-                        println!("\t.");
+                        //println!("\t.");
                     }
                     else {
                         let content: Vec<&str> = content.split_whitespace().collect();
                         let num = content[0].parse::<i32>().unwrap();
                         let color2 = content[1..3].join(" ");
-                        println!("\t{} {}", num, color2);
+                        //println!("\t{} {}", num, color2);
                         rules.add_rule(color, num, &color2)
                     }
                 }
@@ -120,7 +128,10 @@ fn main() {
 
         println!("Rules:\n{:?}", rules);
 
+
         let searched = rules.get_bag_kind("shiny gold");
+        
+        /*
         let mut found: HashSet<String> = HashSet::new();
         found.insert(searched.color.to_string());
         let mut previous_found_num = 0;
@@ -138,14 +149,38 @@ fn main() {
                     }
                 }
             }
-            println!("found this round: {:?}", found2);
+            //println!("found this round: {:?}", found2);
             found = found.union(&found2).cloned().collect();
-            println!("found: {:?}", found);
+            //println!("found: {:?}", found);
             previous_found_num = found_num;
             found_num = found.len();
         }
 
         // len()-1 because we remove the actual searched bag from the set
         println!("{} way to get a {}", found.len() - 1, searched.color);
+        */
+
+        let mut bag_count =  0;
+        let mut to_explore: Vec<(i32, usize)> = Vec::new();
+        to_explore.push((1, *rules.index_by_color.get(&searched.color).unwrap()));
+
+        while !to_explore.is_empty() {
+            let mut to_explore2: Vec<(i32, usize)> = Vec::new();
+            while let Some((coef, bag_index)) = to_explore.pop() {
+            //for bag_index in to_explore {
+                let bag = rules.kind_of_bags_by_index.get(bag_index).unwrap();
+                for (count, inside_id) in &bag.contains {
+                    let inside = rules.kind_of_bags_by_index.get(*inside_id).unwrap();
+                    println!("{} contains {} bags of id {} ({})", bag.color, count, inside_id, inside.color);
+                    bag_count += coef * count;
+                    println!("\tcount: {}", bag_count);
+                    to_explore2.push((*count, *inside_id));
+                }
+            }
+            println!("to explore: {:?}", to_explore2);
+            to_explore.extend(to_explore2);
+        }
+
+        println!("{} bags", bag_count);
     }
 }
