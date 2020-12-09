@@ -174,7 +174,7 @@ fn main() {
                     println!("{} contains {} bags of id {} ({})", bag.color, count, inside_id, inside.color);
                     bag_count += coef * count;
                     println!("\tcount: {}", bag_count);
-                    to_explore2.push((*count, *inside_id));
+                    to_explore2.push((*count * coef, *inside_id));
                 }
             }
             println!("to explore: {:?}", to_explore2);
