@@ -13,16 +13,16 @@ where P: AsRef<Path>, {
 
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day9.txt") {
-        let window_size = 25;
-        let mut nums = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap());
-        //let nums = nums.into_iter();
+        let window_size = 5;
+        let nums: Vec<u64> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
+        let mut nums_iter = nums.iter();
         let mut queue: VecDeque<u64> = VecDeque::with_capacity(window_size);
-        let firsts = nums.by_ref().take(window_size);
+        let firsts = nums_iter.by_ref().take(window_size);
         queue.extend(firsts.into_iter());
 
         println!("Preamble: {:?}", queue);
 
-        for num in nums {
+        for &num in nums_iter {
             //println!("{}", num);
             let mut sol_n1 = None;
             let mut sol_n2 = None;
@@ -47,6 +47,38 @@ fn main() {
             }
             else {
                 println!("{} is invalid because no sum found in {:?}", num, queue);
+
+                // try to find encryption weakness
+
+                let mut nums = nums.iter();
+                let mut sum_set: VecDeque<u64> =  VecDeque::new();
+                let mut sum: u64 = 0;
+                loop {
+                    if let Some(&n) = nums.next() {                    
+                        sum += n;
+                        sum_set.push_back(n);
+                        println!("Current sum is {} compared to {} in {:?}", sum, num, sum_set);
+                        
+                        while sum > num {
+                            sum -= sum_set.pop_front().unwrap();
+                        }
+                        
+                        if sum == num {
+                            let mut sorted: Vec<u64> = Vec::new();
+                            sorted.extend(sum_set.clone().into_iter());
+                            sorted.sort();
+                            let weakness = sorted.first().unwrap() + sorted.last().unwrap();
+                            println!("Found weakness {} in {:?}", weakness, sum_set);
+                            break;
+                        }
+                    }
+                    else {
+                        println!("Could not find weakness");
+                        break;
+                    }
+                }
+
+                return;
             }
 
             queue.push_back(num);
