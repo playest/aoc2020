@@ -11,7 +11,7 @@ where P: AsRef<Path>, {
 
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day11.txt") {
-        let mut items: Vec<_> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
+        let items: Vec<_> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
         println!("{:?}", items);
 
         let mut iter_items = items.into_iter();
