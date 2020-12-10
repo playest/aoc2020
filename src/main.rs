@@ -23,8 +23,12 @@ fn main() {
         println!("Preamble: {:?}", queue);
 
         for num in nums {
-            //queue.
-            println!("{}", num);
+            //println!("{}", num);
+            for (i1, n1) in queue.clone().iter().enumerate() {
+                for (i2, n2) in queue.clone().iter().enumerate() {
+                    println!("{} + {} = {}", n1, n2, n1 + n2);
+                }
+            }
         }
     }
 }
