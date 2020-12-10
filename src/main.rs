@@ -13,7 +13,7 @@ where P: AsRef<Path>, {
 
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day9.txt") {
-        let window_size = 5;
+        let window_size = 25;
         let nums: Vec<u64> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
         let mut nums_iter = nums.iter();
         let mut queue: VecDeque<u64> = VecDeque::with_capacity(window_size);
