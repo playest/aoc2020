@@ -9,7 +9,13 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
-
+fn factorial(num: u64) -> u64 {
+    match num {
+        0 => 1,
+        1 => 1,
+        _ => factorial(num - 1) * num,
+    }
+}
 
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day10.txt") {
@@ -17,23 +23,35 @@ fn main() {
         nums.insert(0, 0);
         nums.sort();
         nums.push(nums.last().unwrap() + 3);
+        println!("{:?}", nums);
 
+        let mut previous: Option<u64> = None;
         let mut diff_count: HashMap<u64, usize> = HashMap::new();
         let mut iter_nums = nums.into_iter().peekable();
+        let mut can_be_removed = 0;
+        let mut arrangments = 0;
         while let Some(num) = iter_nums.next() {
-            let next = iter_nums.peek();
-            match next {
-                None => {}
-                Some(&next) => {
-                    let diff = next - num;
-                    if let Some(count) = diff_count.get_mut(&diff) {
-                        *count += 1;
-                    }
-                    else {
-                        diff_count.insert(diff, 1);
+            if let Some(previous) = previous {
+                let next = iter_nums.peek();
+                match next {
+                    None => {}
+                    Some(&next) => {
+                        println!("{} _{}_ {}", previous, num, next);
+                        let diff = next - previous;
+                        if diff <= 3 {
+                            can_be_removed += 1;
+                            println!("\t{} could be removed, consecutive: {}", num, can_be_removed);
+                        }
+                        else if can_be_removed != 0 {
+                            let new_arrangments = factorial(can_be_removed + 1);
+                            arrangments += new_arrangments;
+                            println!("end of remove chain, {} new arrangements for {} total arrangements", new_arrangments, arrangments);
+                            can_be_removed = 0;
+                        }
                     }
                 }
             }
+            previous = Some(num);
         }
 
         let c1 = diff_count.get(&1).unwrap_or(&0);
