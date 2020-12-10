@@ -16,6 +16,7 @@ fn main() {
         let mut nums: Vec<u64> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
         nums.insert(0, 0);
         nums.sort();
+        nums.push(nums.last().unwrap() + 3);
 
         let mut diff_count: HashMap<u64, usize> = HashMap::new();
         let mut iter_nums = nums.into_iter().peekable();
@@ -36,7 +37,7 @@ fn main() {
         }
 
         let c1 = diff_count.get(&1).unwrap_or(&0);
-        let c2 = diff_count.get(&3).unwrap_or(&0);
-        println!("Diffs: {:?}, product: {} * {} = {}", diff_count, c1, c2, c1 * c2);
+        let c3 = diff_count.get(&3).unwrap_or(&0);
+        println!("Diffs: {:?}, product: {} * {} = {}", diff_count, c1, c3, c1 * c3);
     }
 }
