@@ -13,10 +13,10 @@ where P: AsRef<Path>, {
 
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day9.txt") {
-        let window_size = 5;
-        let mut nums = lines.into_iter().map(|e| e.unwrap().parse::<i32>().unwrap());
+        let window_size = 25;
+        let mut nums = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap());
         //let nums = nums.into_iter();
-        let mut queue: VecDeque<i32> = VecDeque::with_capacity(window_size);
+        let mut queue: VecDeque<u64> = VecDeque::with_capacity(window_size);
         let firsts = nums.by_ref().take(window_size);
         queue.extend(firsts.into_iter());
 
@@ -43,7 +43,7 @@ fn main() {
             }
 
             if let Some(sum) = solution {
-                println!("{} is valid because = {} + {} = {} in {:?}", num, sol_n1.unwrap(), sol_n2.unwrap(), sum, queue);
+                //println!("{} is valid because = {} + {} = {} in {:?}", num, sol_n1.unwrap(), sol_n2.unwrap(), sum, queue);
             }
             else {
                 println!("{} is invalid because no sum found in {:?}", num, queue);
