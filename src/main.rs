@@ -24,11 +24,33 @@ fn main() {
 
         for num in nums {
             //println!("{}", num);
-            for (i1, n1) in queue.clone().iter().enumerate() {
-                for (i2, n2) in queue.clone().iter().enumerate() {
-                    println!("{} + {} = {}", n1, n2, n1 + n2);
+            let mut sol_n1 = None;
+            let mut sol_n2 = None;
+            let mut solution = None;
+            let it1 = queue.iter();
+            
+            'search: for (i1, n1) in it1.enumerate() {
+                let it2 = queue.iter();
+                for (i2, n2) in it2.enumerate() {
+                    let sum = n1 + n2;
+                    if i1 != i2 && sum == num {
+                        solution = Some(sum);
+                        sol_n1 = Some(n1);
+                        sol_n2 = Some(n2);
+                        break 'search;
+                    }
                 }
             }
+
+            if let Some(sum) = solution {
+                println!("{} is valid because = {} + {} = {} in {:?}", num, sol_n1.unwrap(), sol_n2.unwrap(), sum, queue);
+            }
+            else {
+                println!("{} is invalid because no sum found in {:?}", num, queue);
+            }
+
+            queue.push_back(num);
+            queue.pop_front();
         }
     }
 }
