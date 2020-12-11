@@ -92,12 +92,12 @@ impl Room {
             ( 1 ,  1 ),
         ];
         for (dx, dy) in offsets {
-            println!("Look towards {}, {}", dx, dy);
+            //println!("Look towards {}, {}", dx, dy);
             let mut x = x + dx;
             let mut y = y + dy;
             loop {
                 let pos = self.get(x, y);
-                println!("\tLook at {}, {} = {:?}", x, y, pos);
+                //println!("\tLook at {}, {} = {:?}", x, y, pos);
                 match pos {
                     None => {
                         break; // we reached the border of the room
