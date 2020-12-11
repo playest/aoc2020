@@ -164,10 +164,12 @@ fn main() {
         let mut prev_room = Room::new(items);
 
         // tests
-        let p = prev_room.get(3, 3);
+        let x = 3;
+        let y = 4;
+        let p = prev_room.get(x, y);
+        let adj = prev_room.adjacent(x, y);
         println!("origin: {:?}", p);
-        let p = prev_room.adjacent(3, 3);
-        println!("adj: {}, {:?}", p.len(), p);
+        println!("adj: {}, {:?}", adj.len(), adj);
         
         return;
         // run
