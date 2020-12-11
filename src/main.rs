@@ -171,7 +171,6 @@ fn main() {
         println!("origin: {:?}", p);
         println!("adj: {}, {:?}", adj.len(), adj);
         
-        return;
         // run
         let mut new_room: Room;
         println!("=> round {}:\n{}", round, prev_room);
