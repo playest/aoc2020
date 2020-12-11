@@ -1,6 +1,7 @@
 use std::{fs::File};
 use std::io::{self, BufRead};
-use std::path::Path;
+use std::{fmt::Display, path::Path};
+use std::convert::TryFrom;
 
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
@@ -9,14 +10,141 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Position {
+    Floor,
+    EmptySeat,
+    OccupiedSeat,
+}
+
+impl Position {
+    fn from_char(c: char) -> Position {
+        match c {
+            'L' => Position::EmptySeat,
+            '#' => Position::OccupiedSeat,
+            '.' => Position::Floor,
+            _ => panic!("unknown char {}", c),
+        }
+    }
+
+    fn to_char(&self) -> char {
+        match self {
+            Position::EmptySeat => 'L',
+            Position::OccupiedSeat => '#',
+            Position::Floor => '.',
+        }
+    }
+}
+
+impl Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_char())
+    }
+}
+
+#[derive(Clone, PartialEq)]
+struct Room {
+    positions: Vec<Vec<Position>>
+}
+
+impl Room {
+    fn new(positions: Vec<Vec<Position>>) -> Self {
+        Room { positions }
+    }
+
+    fn get(&self, x: i32, y: i32) -> Option<Position> {
+        let x = usize::try_from(x).ok()?;
+        let y = usize::try_from(y).ok()?;
+        let line = self.positions.get(y)?;
+        line.get(x).copied()
+    }
+
+    fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Position> {
+        let x = usize::try_from(x).ok()?;
+        let y = usize::try_from(y).ok()?;
+        let line = self.positions.get_mut(y)?;
+        line.get_mut(x)
+    }
+
+    fn adjacent(&self, x: i32, y: i32) -> Vec<Position> {
+        let mut adj: Vec<Position> = Vec::with_capacity(8);
+        self.get(x - 1, y - 1).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x    , y - 1).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x + 1, y - 1).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x - 1, y    ).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x + 1, y    ).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x - 1, y + 1).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x    , y + 1).and_then(|e| { adj.push(e); Some(e) });
+        self.get(x + 1, y + 1).and_then(|e| { adj.push(e); Some(e) });
+        adj
+    }
+
+    fn step(&self) -> Self {
+        let mut next_step = self.clone();
+        for (y, line) in self.positions.iter().enumerate() {
+            for (x, &pos) in line.iter().enumerate() {
+                let adj_occupied_seats = self.adjacent(x as i32, y as i32).iter().filter(|&&e| e == Position::OccupiedSeat).count();
+                //let adj_free_seats = self.adjacent(x as i32, y as i32).iter().filter(|&&e| e != Position::OccupiedSeat).count();
+                //println!("{}, {} -> adj_occupied_seats: {}, adj_free_seats: {}", x, y, adj_occupied_seats, adj_free_seats);
+
+                if pos == Position::EmptySeat && adj_occupied_seats == 0 {
+                    //println!("Free seat!");
+                    *next_step.get_mut(x as i32, y as i32).unwrap() = Position::OccupiedSeat;
+                }
+                else if pos == Position::OccupiedSeat && adj_occupied_seats >= 4 {
+                    //println!("Leave seat!");
+                    *next_step.get_mut(x as i32, y as i32).unwrap() = Position::EmptySeat;
+                }
+            }
+        }
+        next_step
+    }
+}
+
+impl Display for Room {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for line in &self.positions {
+            for pos in line {
+                write!(f, " {} ", pos)?
+            }
+            writeln!(f, "")?
+        }
+        Ok(())
+    }
+}
+
 fn main() {
     if let Ok(lines) = read_lines("./inputs/input_day11.txt") {
-        let items: Vec<_> = lines.into_iter().map(|e| e.unwrap().parse::<u64>().unwrap()).collect();
-        println!("{:?}", items);
+        let items = lines.into_iter()
+            .map(|e| e.unwrap().chars().into_iter()
+                .map(|c| Position::from_char(c)).collect::<Vec<_>>()
+        ).collect::<Vec<Vec<_>>>();
 
-        let mut iter_items = items.into_iter();
-        while let Some(item) = iter_items.next() {
-            println!("{}", item);
+        let mut round = 0;
+        let mut prev_room = Room::new(items);
+        let mut new_room: Room;
+        println!("=> round {}:\n{}", round, prev_room);
+        loop {
+            round += 1;
+            new_room = prev_room.step();
+            println!("=> round {}:\n{}", round, new_room);
+            if new_room == prev_room {
+                break;
+            }
+            prev_room = new_room;
+            if round > 100 {
+                break;
+            }
         }
+
+        println!("Stabilized after {} rounds:\n{}", round, prev_room);
+        let occupied: usize = prev_room.positions
+            .iter()
+            .map(|l| l.iter()
+                .filter(|&&p| p == Position::OccupiedSeat)
+                .count()
+        ).sum();
+        println!("Occupied seats: {}", occupied);
+
     }
 }
