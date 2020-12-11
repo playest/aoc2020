@@ -154,47 +154,11 @@ impl Display for Room {
 }
 
 fn main() {
-    if let Ok(lines) = read_lines("./inputs/input_day11.txt") {
-        let items = lines.into_iter()
-            .map(|e| e.unwrap().chars().into_iter()
-                .map(|c| Position::from_char(c)).collect::<Vec<_>>()
-        ).collect::<Vec<Vec<_>>>();
-
-        let mut round = 0;
-        let mut prev_room = Room::new(items);
-
-        // tests
-        let x = 1;
-        let y = 1;
-        let p = prev_room.get(x, y);
-        let adj = prev_room.adjacent(x, y);
-        println!("origin: {:?}", p);
-        println!("adj: {}, {:?}", adj.len(), adj);
-        
-        // run
-        let mut new_room: Room;
-        println!("=> round {}:\n{}", round, prev_room);
-        loop {
-            round += 1;
-            new_room = prev_room.step();
-            println!("=> round {}:\n{}", round, new_room);
-            if new_room == prev_room {
-                break;
-            }
-            prev_room = new_room;
-            if round > 100 {
-                break;
+    if let Ok(lines) = read_lines("./inputs/input_day12.txt") {
+        for line in lines {
+            if let Ok(line) = line {
+                println!("{}", line);
             }
         }
-
-        println!("Stabilized after {} rounds:\n{}", round, prev_room);
-        let occupied: usize = prev_room.positions
-            .iter()
-            .map(|l| l.iter()
-                .filter(|&&p| p == Position::OccupiedSeat)
-                .count()
-        ).sum();
-        println!("Occupied seats: {}", occupied);
-
     }
 }
