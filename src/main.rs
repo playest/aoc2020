@@ -98,12 +98,19 @@ impl Room {
             loop {
                 let pos = self.get(x, y);
                 println!("\tLook at {}, {} = {:?}", x, y, pos);
-                if pos.is_none() {
-                    break; // we reached the border of the room
-                }
-                if pos.unwrap_or(Position::Floor) == Position::OccupiedSeat {
-                    adj.push(Position::OccupiedSeat);
-                    break;
+                match pos {
+                    None => {
+                        break; // we reached the border of the room
+                    },
+                    Some(Position::OccupiedSeat) => {
+                        adj.push(Position::OccupiedSeat);
+                        break;
+                    },
+                    Some(Position::EmptySeat) => {
+                        adj.push(Position::OccupiedSeat);
+                        break;
+                    },
+                    _ => {}
                 }
                 x += dx;
                 y += dy;
@@ -162,7 +169,6 @@ fn main() {
         let p = prev_room.adjacent(3, 3);
         println!("adj: {}, {:?}", p.len(), p);
         
-
         return;
         // run
         let mut new_room: Room;
