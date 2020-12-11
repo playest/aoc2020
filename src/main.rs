@@ -91,7 +91,7 @@ impl Room {
                     //println!("Free seat!");
                     *next_step.get_mut(x as i32, y as i32).unwrap() = Position::OccupiedSeat;
                 }
-                else if pos == Position::OccupiedSeat && adj_occupied_seats >= 4 {
+                else if pos == Position::OccupiedSeat && adj_occupied_seats >= 5 {
                     //println!("Leave seat!");
                     *next_step.get_mut(x as i32, y as i32).unwrap() = Position::EmptySeat;
                 }
