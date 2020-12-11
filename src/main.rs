@@ -66,7 +66,7 @@ impl Room {
         line.get_mut(x)
     }
 
-    fn adjacent(&self, x: i32, y: i32) -> Vec<Position> {
+    fn adjacent1(&self, x: i32, y: i32) -> Vec<Position> {
         let mut adj: Vec<Position> = Vec::with_capacity(8);
         self.get(x - 1, y - 1).and_then(|e| { adj.push(e); Some(e) });
         self.get(x    , y - 1).and_then(|e| { adj.push(e); Some(e) });
@@ -76,6 +76,39 @@ impl Room {
         self.get(x - 1, y + 1).and_then(|e| { adj.push(e); Some(e) });
         self.get(x    , y + 1).and_then(|e| { adj.push(e); Some(e) });
         self.get(x + 1, y + 1).and_then(|e| { adj.push(e); Some(e) });
+        adj
+    }
+
+    fn adjacent(&self, x: i32, y: i32) -> Vec<Position> {
+        let mut adj: Vec<Position> = Vec::with_capacity(8);
+        let offsets = vec![
+            (- 1, - 1),
+            ( 0 , - 1),
+            ( 1 , - 1),
+            (- 1,  0 ),
+            ( 1 ,  0 ),
+            (- 1,  1 ),
+            ( 0 ,  1 ),
+            ( 1 ,  1 ),
+        ];
+        for (dx, dy) in offsets {
+            println!("Look towards {}, {}", dx, dy);
+            let mut x = x + dx;
+            let mut y = y + dy;
+            loop {
+                let pos = self.get(x, y);
+                println!("\tLook at {}, {} = {:?}", x, y, pos);
+                if pos.is_none() {
+                    break; // we reached the border of the room
+                }
+                if pos.unwrap_or(Position::Floor) == Position::OccupiedSeat {
+                    adj.push(Position::OccupiedSeat);
+                    break;
+                }
+                x += dx;
+                y += dy;
+            }
+        }
         adj
     }
 
@@ -122,6 +155,16 @@ fn main() {
 
         let mut round = 0;
         let mut prev_room = Room::new(items);
+
+        // tests
+        let p = prev_room.get(3, 3);
+        println!("origin: {:?}", p);
+        let p = prev_room.adjacent(3, 3);
+        println!("adj: {}, {:?}", p.len(), p);
+        
+
+        return;
+        // run
         let mut new_room: Room;
         println!("=> round {}:\n{}", round, prev_room);
         loop {
