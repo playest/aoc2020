@@ -107,7 +107,7 @@ impl Room {
                         break;
                     },
                     Some(Position::EmptySeat) => {
-                        adj.push(Position::OccupiedSeat);
+                        adj.push(Position::EmptySeat);
                         break;
                     },
                     _ => {}
@@ -164,8 +164,8 @@ fn main() {
         let mut prev_room = Room::new(items);
 
         // tests
-        let x = 3;
-        let y = 4;
+        let x = 1;
+        let y = 1;
         let p = prev_room.get(x, y);
         let adj = prev_room.adjacent(x, y);
         println!("origin: {:?}", p);
