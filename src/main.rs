@@ -92,6 +92,12 @@ impl Point {
         self.x += dx;
         self.y += dy;
     }
+
+    fn translate_copy(&self, dx: i32, dy: i32) -> Self {
+        let mut this = self.clone();
+        Self::translate(&mut this, dx, dy);
+        this
+    }
 }
 
 impl OrderTaker<AbsoluteInstruction> for Point {
