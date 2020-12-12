@@ -11,3 +11,7 @@ wrong    : 398, 558
 # day 5
 
 too high: 516
+
+# Day 12
+
+too low: 1076
