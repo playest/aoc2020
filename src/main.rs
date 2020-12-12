@@ -97,24 +97,12 @@ impl Point {
 impl OrderTaker<AbsoluteInstruction> for Point {
     fn take_order(&mut self, instruction: AbsoluteInstruction) {
         match instruction {
-            AbsoluteInstruction::North(v) => {
-                self.y -= v;
-            },
-            AbsoluteInstruction::South(v) => {
-                self.y += v;
-            },
-            AbsoluteInstruction::East(v) => {
-                self.x += v;
-            },
-            AbsoluteInstruction::West(v) => {
-                self.x -= v;
-            },
-            AbsoluteInstruction::Left(v) => {
-                self.rotate_left(v);
-            },
-            AbsoluteInstruction::Right(v) => {
-                self.rotate_right(v);
-            },
+            AbsoluteInstruction::North(v) => self.y -= v,
+            AbsoluteInstruction::South(v) => self.y += v,
+            AbsoluteInstruction::East(v) => self.x += v,
+            AbsoluteInstruction::West(v) => self.x -= v,
+            AbsoluteInstruction::Left(v) => self.rotate_left(v),
+            AbsoluteInstruction::Right(v) => self.rotate_right(v),
         };
     }
 }
