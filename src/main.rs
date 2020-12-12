@@ -10,48 +10,43 @@ where P: AsRef<Path>, {
 }
 
 #[derive(Debug, Clone, Copy)]
-enum Instruction {
+enum AbsoluteInstruction {
     North(i32),
     South(i32),
     East(i32),
     West(i32),
     Left(i32),
     Right(i32),
+}
+
+#[derive(Debug)]
+enum RelativeInstruction {
     Forward(i32),
 }
 
+#[derive(Debug)]
+enum Instruction {
+    Abs(AbsoluteInstruction),
+    Rel(RelativeInstruction),
+}
+
 impl Instruction {
-    fn from_char(c: char, v: i32) -> Option<Instruction> {
+    fn from_char(c: char, v: i32) -> Result<Instruction, String> {
         match c {
-            'N' => Some(Instruction::North(v)),
-            'S' => Some(Instruction::South(v)),
-            'E' => Some(Instruction::East(v)),
-            'W' => Some(Instruction::West(v)),
-            'L' => Some(Instruction::Left(v)),
-            'R' => Some(Instruction::Right(v)),
-            'F' => Some(Instruction::Forward(v)),
-            _ => None,
+            'N' => Ok(Instruction::Abs(AbsoluteInstruction::North(v))),
+            'S' => Ok(Instruction::Abs(AbsoluteInstruction::South(v))),
+            'E' => Ok(Instruction::Abs(AbsoluteInstruction::East(v))),
+            'W' => Ok(Instruction::Abs(AbsoluteInstruction::West(v))),
+            'L' => Ok(Instruction::Abs(AbsoluteInstruction::Left(v))),
+            'R' => Ok(Instruction::Abs(AbsoluteInstruction::Right(v))),
+            'F' => Ok(Instruction::Rel(RelativeInstruction::Forward(v))),
+            _ => Err(format!("{} is not a valid char for an Instruction", c).to_string()),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-enum Direction {
-    North,
-    South,
-    East,
-    West,
-}
-
-impl Direction {
-    fn to_instruction(&self, v: i32) -> Instruction {
-        match self {
-            Direction::North => Instruction::North(v),
-            Direction::East => Instruction::East(v),
-            Direction::South => Instruction::South(v),
-            Direction::West => Instruction::West(v),
-        }
-    }
+trait OrderTaker<T> {
+    fn take_order(&mut self, instruction: T);
 }
 
 #[derive(Debug, Clone)]
@@ -73,7 +68,7 @@ impl Point {
             panic!("Cannot turn of {} degrees, angle must be a multiple of 90", deg);
         }
         let mut step = (deg / 90) % 4;
-        println!("\tangle of {} degrees is {} steps right", deg, step);
+        //println!("\tangle of {} degrees is {} steps right", deg, step);
         if step < 0 {
             step += 4;
         }
@@ -93,29 +88,30 @@ impl Point {
         self.rotate_right(-1 * deg);
     }
 
-    fn take_order(&mut self, instruction: Instruction, relative_to: &Point) {
+    fn forward(&mut self, dx: i32, dy: i32) {
+        self.x += dx;
+        self.y += dy;
+    }
+
+    fn take_order(&mut self, instruction: AbsoluteInstruction) {
         match instruction {
-            Instruction::North(v) => {
+            AbsoluteInstruction::North(v) => {
                 self.y -= v;
             },
-            Instruction::South(v) => {
+            AbsoluteInstruction::South(v) => {
                 self.y += v;
             },
-            Instruction::East(v) => {
+            AbsoluteInstruction::East(v) => {
                 self.x += v;
             },
-            Instruction::West(v) => {
+            AbsoluteInstruction::West(v) => {
                 self.x -= v;
             },
-            Instruction::Left(v) => {
+            AbsoluteInstruction::Left(v) => {
                 self.rotate_left(v);
             },
-            Instruction::Right(v) => {
+            AbsoluteInstruction::Right(v) => {
                 self.rotate_right(v);
-            },
-            Instruction::Forward(v) => {
-                self.x += relative_to.x;
-                self.y += relative_to.y;
             },
         };
     }
@@ -137,20 +133,16 @@ impl Ship {
 
     fn take_order(&mut self, instruction: Instruction) {
         match instruction {
-            Instruction::North(v) |
-            Instruction::South(v) |
-            Instruction::East(v) |
-            Instruction::West(v) |
-            Instruction::Left(v) |
-            Instruction::Right(v) => {
-                self.waypoint.take_order(instruction, &self.location);
+            Instruction::Abs(abs_ins) => {
+                self.waypoint.take_order(abs_ins);
             },
-            Instruction::Forward(v) => {
+            Instruction::Rel(RelativeInstruction::Forward(v)) => {
                 let mut i = v;
                 while i > 0 {
                     //println!("move a#{}: {:?} / {:?}", i, self.location, self.waypoint);
-                    self.location.take_order(instruction, &self.waypoint);
+                    //self.location.take_order(instruction, &self.waypoint);
                     //println!("move c#{}: {:?} / {:?}", i, self.location, self.waypoint);
+                    self.location.forward(self.waypoint.x, self.waypoint.y);
                     i -= 1;
                 }
             },

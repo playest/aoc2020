@@ -15,3 +15,5 @@ too high: 516
 # Day 12
 
 too low: 1076
+
+.2 right answer : 89936
