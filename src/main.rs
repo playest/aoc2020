@@ -88,7 +88,7 @@ impl Point {
         self.rotate_right(-1 * deg);
     }
 
-    fn forward(&mut self, dx: i32, dy: i32) {
+    fn translate(&mut self, dx: i32, dy: i32) {
         self.x += dx;
         self.y += dy;
     }
@@ -130,7 +130,7 @@ impl OrderTaker<Instruction> for Ship {
             },
             Instruction::Rel(RelativeInstruction::Forward(v)) => {
                 for _ in 0..v {
-                    self.location.forward(self.waypoint.x, self.waypoint.y);
+                    self.location.translate(self.waypoint.x, self.waypoint.y);
                 }
             },
         };
