@@ -50,6 +50,7 @@ impl Direction {
         }
         let mut step = (deg / 90) % 4;
         let mut dir = self.clone();
+        let offset = step.signum();
         while step != 0 {
             dir = match dir {
                 Direction::North => Direction::East,
@@ -57,7 +58,7 @@ impl Direction {
                 Direction::South => Direction::West,
                 Direction::West => Direction::North,
             };
-            step -= 1;
+            step += -1 * offset;
         }
         dir
 
