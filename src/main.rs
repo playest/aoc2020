@@ -129,13 +129,8 @@ impl OrderTaker<Instruction> for Ship {
                 self.waypoint.take_order(abs_ins);
             },
             Instruction::Rel(RelativeInstruction::Forward(v)) => {
-                let mut i = v;
-                while i > 0 {
-                    //println!("move a#{}: {:?} / {:?}", i, self.location, self.waypoint);
-                    //self.location.take_order(instruction, &self.waypoint);
-                    //println!("move c#{}: {:?} / {:?}", i, self.location, self.waypoint);
+                for _ in 0..v {
                     self.location.forward(self.waypoint.x, self.waypoint.y);
-                    i -= 1;
                 }
             },
         };
