@@ -92,7 +92,9 @@ impl Point {
         self.x += dx;
         self.y += dy;
     }
+}
 
+impl OrderTaker<AbsoluteInstruction> for Point {
     fn take_order(&mut self, instruction: AbsoluteInstruction) {
         match instruction {
             AbsoluteInstruction::North(v) => {
@@ -130,7 +132,9 @@ impl Ship {
             waypoint: Point::new(waypoint_x, waypoint_y),
         }
     }
+}
 
+impl OrderTaker<Instruction> for Ship {
     fn take_order(&mut self, instruction: Instruction) {
         match instruction {
             Instruction::Abs(abs_ins) => {
